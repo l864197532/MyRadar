@@ -1,0 +1,117 @@
+#spring:
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://121.89.197.119/Radar?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&useSSL=false
+#    username: root
+#    password: HUst123/
+
+spring:
+  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://localhost:3306/myradar?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+#    username: root
+#    password: 123456
+
+    one:
+      driver-class-name: com.mysql.cj.jdbc.Driver #用netty来接收雷达数据
+      url: jdbc:mysql://localhost:3306/myradar?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+      username: root
+      password: 123456
+    two:
+      driver-class-name: com.mysql.cj.jdbc.Driver #用kafka来接收雷达数据
+      url: jdbc:mysql://localhost:3306/radarproject?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+      username: root
+      password: 123456
+
+  redis:
+    port: 6379 #端口号
+    password: 123456 #输入redis数据库密码
+    host:     #输入ip地址
+    jedis:
+      pool:
+        max-idle: 6    #最大空闲数
+        max-active: 10 #最大连接数
+        min-idle: 2    #最小空闲数
+    timeout: 2000   #连接超时
+server:
+  port: 8080
+
+logging:
+  config: classpath:logback-spring.xml
+  file:
+    path: C:\radarLog
+
+fileupload: #文件传输时客户端与服务端连接的端口
+  upport: 8099  #client
+  backupuploadfolder: D:\MySqlBackup #客户端上传的文职 client
+  downport: 8099 #server
+  backupdownloadfolder: D:\FileBackup   #服务端下载的位置 server
+  SERVERIP: 127.0.0.1 #服务端地址
+
+sys:
+  kafka:
+    #微波雷达
+    radar:
+      bootstrap-servers: 100.65.23.74:9092  #集群节点
+      consumer:
+        group-id: mentugroup2
+        enable-auto-commit: true
+        auto-commit-interval: 100
+        auto-offset-reset: latest
+        key-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer   #配置反序列化器
+        value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+      listener:
+        type: batch
+        max-poll-records: 10
+    #激光雷达
+    fp:
+      bootstrap-servers: 100.65.23.74:9092
+      consumer:
+        group-id: fpgroup2
+        enable-auto-commit: true
+        auto-commit-interval: 100
+        auto-offset-reset: latest
+        key-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+        value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+      listener:
+        type: batch
+        max-poll-records: 10
+    #牌照数据
+    pic:
+      bootstrap-servers: 100.65.23.74:9092
+      consumer:
+        group-id: picgroup2
+        enable-auto-commit: true
+        auto-commit-interval: 5000
+        auto-offset-reset: latest
+        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    #      listener:
+    #        type: batch
+    #        max-poll-records: 100
+    #估计是发送的，还有生产者呢
+    df:
+      bootstrap-servers: 100.65.23.75:9092
+      producer:
+        transaction-id-prefix: transaction
+        retries: 1
+        acks: -1
+        batch-size: 16384
+        buffer-memory: 33554432
+        key-serializer: org.apache.kafka.common.serialization.StringSerializer
+        value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      consumer:
+        group-id: dfgroup2
+        enable-auto-commit: false
+        auto-commit-interval: 100
+        auto-offset-reset: earliest
+        max-poll-records: 100
+        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      listener:
+        type: batch
+zmq:
+  ZMQRecvPort1: 8031
+  ZMQRecvIP1: 100.65.23.158
+  ZMQRecvPort2: 8031
+  ZMQRecvIP2: 100.65.23.159
